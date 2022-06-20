@@ -51,7 +51,7 @@ contract CryptoDevsDAO is Ownable {
         nftHolderOnly
         returns (uint256)
     {
-        require(nftMarketPlace.available(_nftTokenId), "NFT is not for sale");
+        require(nftMarketPlace.available(_nftTokenId), "NFT NOT FOR SALE");
         Proposal storage proposal = proposals[numProposals];
         proposal.nftTokenId = _nftTokenId;
         proposal.deadline = block.timestamp + 5 minutes;
@@ -97,20 +97,28 @@ contract CryptoDevsDAO is Ownable {
         }
     }
 
-    modifier inactiveProposalOnly (uint256 proposalIndex) {
-        require(proposals[proposalIndex].deadline <= block.timestamp,"DEADLINE NOT EXCEEDED");
-        require(proposals[proposalIndex].executed == false);
+    modifier inactiveProposalOnly(uint256 proposalIndex) {
+        require(
+            proposals[proposalIndex].deadline <= block.timestamp,
+            "DEADLINE NOT EXCEEDED"
+        );
+        require(
+            proposals[proposalIndex].executed == false,
+            "PROPOSAL HAS ALREADY BEEN EXECUTED"
+        );
         _;
     }
 
-    function executeProposal(uint256 proposalIndex) external inactiveProposalOnly (proposalIndex) {
+    function executeProposal(uint256 proposalIndex)
+        external
+        inactiveProposalOnly(proposalIndex)
+    {
         Proposal storage proposal = proposals[proposalIndex];
-        if(proposal.yayVotes>proposal.nayVotes){
+        if (proposal.yayVotes > proposal.nayVotes) {
             uint256 nftPrice = nftMarketPlace.getPrice();
-            require(address(this).balance>=nftPrice,"NOT ENOUGH FUNDS");
-            nftMarketPlace.purchase{value:nftPrice}(proposal.nftTokenId);
+            require(address(this).balance >= nftPrice, "NOT ENOUGH FUNDS");
+            nftMarketPlace.purchase{value: nftPrice}(proposal.nftTokenId);
         }
         proposal.executed = true;
-
     }
 }
