@@ -1,5 +1,5 @@
-const NFT_CONTRACT_ADDR = "0x4cb10B2B9C09772323F4171a134DF01D99925c05";
-const NFT_CONTRACT_ABI = [
+export const NFT_CONTRACT_ADDR = "0x4cb10B2B9C09772323F4171a134DF01D99925c05";
+export const NFT_CONTRACT_ABI = [
     {
       "inputs": [
         {
@@ -555,89 +555,9 @@ const NFT_CONTRACT_ABI = [
     }
   ];
 
-const FAKENFTMARKETPLACE_ADDR = "0xC070202A9846AF1378169B84f866a38DDF5F318f";
-const FAKENFTMARKETPLACE_ABI = [
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "_tokenId",
-        "type": "uint256"
-      }
-    ],
-    "name": "available",
-    "outputs": [
-      {
-        "internalType": "bool",
-        "name": "",
-        "type": "bool"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "getPrice",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "nftPrice",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "_tokenId",
-        "type": "uint256"
-      }
-    ],
-    "name": "purchase",
-    "outputs": [],
-    "stateMutability": "payable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "name": "tokens",
-    "outputs": [
-      {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  }
-];
 
-const CryptoDevDAO_ADDR = "0xDB5dcd7c106914bDc64B5D01098dd7412f75e106";
-const CryptoDevDAO_ABI = [
+export const CryptoDevDAO_ADDR = "0xDB5dcd7c106914bDc64B5D01098dd7412f75e106";
+export const CryptoDevDAO_ABI = [
   {
     "inputs": [
       {
@@ -825,4 +745,3 @@ const CryptoDevDAO_ABI = [
   }
 ];
 
-module.exports = {NFT_CONTRACT_ADDR, NFT_CONTRACT_ABI};

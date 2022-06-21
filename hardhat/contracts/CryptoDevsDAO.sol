@@ -3,7 +3,7 @@ pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 
-interface IFakeNFTMarketPlace {
+interface IFakeNFTMarketplace {
     function getPrice() external view returns (uint256);
 
     function available(uint256 _tokenId) external view returns (bool);
@@ -11,7 +11,7 @@ interface IFakeNFTMarketPlace {
     function purchase(uint256 _tokenId) external payable;
 }
 
-interface ICryptoDevs {
+interface ICryptoDevsNFT {
     function balanceOf(address _owner) external view returns (uint256);
 
     function tokenOfOwnerByIndex(address _owner, uint256 _index)
@@ -27,18 +27,18 @@ contract CryptoDevsDAO is Ownable {
         uint256 yayVotes;
         uint256 nayVotes;
         bool executed;
-        mapping(uint256 => bool) nftVoted;
+        mapping(uint256 => bool) voters;
     }
 
     mapping(uint256 => Proposal) public proposals;
     uint256 public numProposals;
 
-    IFakeNFTMarketPlace nftMarketPlace;
-    ICryptoDevs cryptoDevsNFT;
+    IFakeNFTMarketplace nftMarketplace;
+    ICryptoDevsNFT cryptoDevsNFT;
 
-    constructor(address _nftMarketPlace, address _cryptoDevsNFT) payable {
-        nftMarketPlace = IFakeNFTMarketPlace(_nftMarketPlace);
-        cryptoDevsNFT = ICryptoDevs(_cryptoDevsNFT);
+    constructor(address _nftMarketplace, address _cryptoDevsNFT) payable {
+        nftMarketplace = IFakeNFTMarketplace(_nftMarketplace);
+        cryptoDevsNFT = ICryptoDevsNFT(_cryptoDevsNFT);
     }
 
     modifier nftHolderOnly() {
@@ -51,12 +51,12 @@ contract CryptoDevsDAO is Ownable {
         nftHolderOnly
         returns (uint256)
     {
-        require(nftMarketPlace.available(_nftTokenId), "NFT NOT FOR SALE");
+        require(nftMarketplace.available(_nftTokenId), "NFT NOT FOR SALE");
         Proposal storage proposal = proposals[numProposals];
         proposal.nftTokenId = _nftTokenId;
         proposal.deadline = block.timestamp + 5 minutes;
         numProposals++;
-        return (numProposals - 1);
+        return numProposals - 1;
     }
 
     modifier activeProposalOnly(uint256 proposalIndex) {
@@ -78,21 +78,21 @@ contract CryptoDevsDAO is Ownable {
         activeProposalOnly(proposalIndex)
     {
         Proposal storage proposal = proposals[proposalIndex];
-        uint256 balancOfNFT = cryptoDevsNFT.balanceOf(msg.sender);
-        uint256 numOfVotes = 0;
+        uint256 voterNFTBalance = cryptoDevsNFT.balanceOf(msg.sender);
+        uint256 numVotes = 0;
 
-        for (uint256 i = 0; i < balancOfNFT; i++) {
+        for (uint256 i = 0; i < voterNFTBalance; i++) {
             uint256 tokenId = cryptoDevsNFT.tokenOfOwnerByIndex(msg.sender, i);
-            if (proposal.nftVoted[tokenId] == false) {
-                numOfVotes++;
-                proposal.nftVoted[tokenId] = true;
+            if (proposal.voters[tokenId] == false) {
+                numVotes++;
+                proposal.voters[tokenId] = true;
             }
-            require(numOfVotes > 0, "Already Voted");
+            require(numVotes > 0, "Already Voted");
 
             if (vote == Vote.YAY) {
-                proposal.yayVotes++;
+                proposal.yayVotes += numVotes; 
             } else {
-                proposal.nayVotes++;
+                proposal.nayVotes += numVotes;
             }
         }
     }
@@ -115,10 +115,18 @@ contract CryptoDevsDAO is Ownable {
     {
         Proposal storage proposal = proposals[proposalIndex];
         if (proposal.yayVotes > proposal.nayVotes) {
-            uint256 nftPrice = nftMarketPlace.getPrice();
+            uint256 nftPrice = nftMarketplace.getPrice();
             require(address(this).balance >= nftPrice, "NOT ENOUGH FUNDS");
-            nftMarketPlace.purchase{value: nftPrice}(proposal.nftTokenId);
+            nftMarketplace.purchase{value: nftPrice}(proposal.nftTokenId);
         }
         proposal.executed = true;
     }
+
+    function withdrawEther() external onlyOwner {
+        payable(owner()).transfer(address(this).balance);
+    }
+
+    receive() external payable {}
+
+    fallback() external payable {}
 }

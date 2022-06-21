@@ -13,7 +13,7 @@ async function main() {
     //@dev Deployent of DAO Contract
     const daoContract = await ethers.getContractFactory("CryptoDevsDAO");
     const daoContractDeployed = await daoContract.deploy(NFTMARKETPLACE_CONTRACT_ADDR, NFT_CONTRACT_ADDR, {
-        value: ethers.utils.parseEther("0.5")
+        value: ethers.utils.parseEther("0.1")
     });
     await daoContractDeployed.deployed();
     console.log("CryptoDevs DAO Contract deployed successfully to the address : " + daoContractDeployed.address);
