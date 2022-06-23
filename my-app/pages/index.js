@@ -153,6 +153,21 @@ export default function Home() {
     }
   };
 
+  const executeProposal = async (proposalId) =>{
+    try {
+      const signer = await getProviderOrSigner(true);
+      const daoContract = await getDAOContractInstance(signer);
+      const tx = await daoContract.executeProposal(proposalId);
+      setLoading(true);
+      await tx.wait();
+      setLoading(false);
+      await fetchAllProposals();
+      window.alert("Proposal executed successfully.");
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
   const connectWallet = async () => {
     try {
       await getProviderOrSigner();
@@ -234,7 +249,7 @@ export default function Home() {
       return (
         <div style={{display:"flex", flexDirection:"row"}}>
           {proposals.map((p, index) => (
-            <div key={index} style={{margin:"10px 10px"}} className={styles.proposalCard}>
+            <div key={index} style={{padding:"10px 10px", margin:"10px 10px"}} className={styles.proposalCard}>
               <p>Proposal ID: {p.proposalId}</p>
               <p>Fake NFT to Purchase: {p.nftTokenId}</p>
               <p>Deadline: {p.deadline.toLocaleString()}</p>
@@ -317,13 +332,15 @@ export default function Home() {
             View Proposal
           </button>
         </div>
+        <div style={{margin:"20px"}}>
         {renderTabs()}
+        </div>
         <div>
           <img className={styles.image} src="0.svg" />
         </div>
       </div>
 
-      <footer className={styles.footer}>Made with ❤ by Vishal @ 2022</footer>
+      <footer className={styles.footer}>Made with &#65039; by Vishal @ 2022</footer>
     </div>
   );
 }
